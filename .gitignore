@@ -1,0 +1,9 @@
+# MATLAB generated caches and temporary files
+slprj/
+*.slxc
+*.asv
+*.autosave
+simulation/report_outputs_*/
+simulation/report_outputs_*.zip
+.DS_Store
+Thumbs.db

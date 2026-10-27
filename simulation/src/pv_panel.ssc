@@ -1,0 +1,66 @@
+component pv_panel
+
+    inputs
+        lambda = { 0, '1' }; % R:left
+    end
+
+    outputs
+        p_mppt = { 0, 'W' }; % p:right
+    end
+
+    parameters(Access=private)
+        k = { 1.3805e-23, 'N*m/K'};
+        q = { 1.6e-19, 'C'};
+    end
+
+    parameters
+        Nps = { 8, '1' };           % Nps - Number of PV modules in parallel connection
+        Nss = { 300, '1' };         % Nss - Number of PV cells in series connection
+        T = { 298.15, 'K' };        % T - Threshold voltage proportional to TS
+        Tr = { 298.15, 'K' };       % Tr - Reference temperature
+        Isc = { 3.27, 'A' };        % Isc - Short circuit current at Tr
+        Kl = { 0.0017, 'A/K' };     % Kl - Short circuit current temperature coeff
+        Ior = { 2.0793e-6, 'A' };   % Ior - Irs at Tr
+        Ego = { 1.1, 'V' };         % Ego - band gap energy of the semiconductor
+        A = { 1.6, '1' };           % A - factor. cell deviation from de ideal pn junction
+    end
+
+    nodes
+        p = foundation.electrical.electrical; % +
+        n = foundation.electrical.electrical; % -
+    end
+
+    annotations
+        [p, n]  : Side = right;
+        lambda  : Side = left;
+    end
+
+    branches
+        i : p.i -> n.i;
+    end
+
+    variables (ExternalAccess = observe)
+        v = { 0, 'V' };
+        i = { 0, 'A' };
+    end
+
+    intermediates
+        Vt = k*T/q;
+        Iph = (Isc+Kl*(T-Tr))*lambda;
+        Irs = Ior*(T/Tr)^3*exp(q*Ego*(1/Tr-1/T)/(k*A));
+    end
+
+    equations
+        v == p.v - n.v;
+        v == (Nss*Vt*A*(lambertw_approx(exp(1)*(1+(Iph/Irs)))-1));
+        p_mppt == (v*(Nps*(Iph-Irs*(exp(v/(Nss*Vt*A))-1))));
+    end
+end
+
+function out = lambertw_approx(x)
+    definitions
+        E = 0.4586887;
+        out = (1+E)*log(6/5*x/log(12/5*x/log(1+12/5*x))) ...
+            - E*log(2*x/log(1+2*x));
+    end
+end

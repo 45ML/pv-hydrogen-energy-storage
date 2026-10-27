@@ -1,0 +1,6 @@
+5 of 5 cases have complete simulation data.
+PV bus instrumentation enabled: 0
+Graphs come from logged Simulink outputs. Ideal slopes in the CSV are theoretical checks.
+No 24-hour dispatch, optimal-control comparison or motor speed-control test was run.
+Grid support remains enabled; these plots do not prove islanded regulation.
+Tank bounds are checked after each run; this does not implement a tank-aware controller.

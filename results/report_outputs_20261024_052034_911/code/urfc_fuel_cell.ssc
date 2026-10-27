@@ -1,0 +1,70 @@
+component urfc_fuel_cell
+    % Fuel Cell mode model of a URFC
+    
+    inputs
+       h2_in = { 0.0, 'g/s' };    % H2_in 
+    end
+
+    nodes
+        p = foundation.electrical.electrical; % +
+        n = foundation.electrical.electrical; % -
+    end
+    
+    parameters(Access=private)
+        mmH2 = { 2.01588, 'g/mol'};
+    end
+
+    parameters
+        N_cells = { 10, '1' };                      % Number of cells in the stack
+        A_cell  = { 100, 'cm^2' };                  % Active cell area
+        E_rev_0 = { 1.23, 'V' };                    % Reversible potential of URPEMFC
+        I_loss_internal = { 0.008, 'A/cm^2' };      % Lost internal current density
+        I_o_anode = { 0.15, 'A/cm^2' };             % Anode exchange current density
+        I_o_cathode = { 1.5e-4, 'A/cm^2' };         % Cathode exchange current density
+        R_ion = { 0.01, 'Ohm*cm^2' };               % Area specific ion resistance
+        R_CR = { 0.03, 'Ohm*cm^2' };                % Area specific contact resistance
+        R_elect =  {0, 'Ohm*cm^2' };                % Area specific resistance between plates and connections
+        I_limit_anode = { 15, 'A/cm^2' };           % Anode limiting current density
+        I_limit_cathode = { 2.5, 'A/cm^2' };        % Cathode limiting current density
+        A_anodo = {0.0304 , 'V'};
+        A_catodo = {0.0507, 'V'};
+        T = { 353.15, 'K' };                 % Temperature of the cell
+        R_gas = { 8.3145, 'J/(mol*K)' };     % Gas constant
+        F_constant = { 96485, 'C/mol' };     % Faraday's constant
+        n_electrons = { 2, '1' };            % Number of electrons
+    end
+
+    variables
+        i = { 0, 'A' }; % Fuel Cell Current
+        v = { 0, 'V' }; % Fuel Cell Voltage
+    end
+
+    intermediates
+        %i = (h2_in*F_constant)/(mmH2*N_cells);
+       I = (h2_in*n_electrons*F_constant)/(mmH2*N_cells) / A_cell;
+        E_rev_FC = E_rev_0 + ((R_gas * T) / (n_electrons * F_constant)) * log((1 * .21^0.5) / 1);
+        E_act_total =  ((R_gas * T) / (0.5*n_electrons * F_constant)) * (log((I_loss_internal + I) / I_o_anode) + log((I_loss_internal + I) / I_o_cathode));
+        E_ohm_total = I * (R_elect + R_ion + R_CR);
+        E_conc_total = (R_gas * T) / (n_electrons * F_constant) * (log(abs(1 - (I / I_limit_anode))) + log(abs(1 - (I / I_limit_cathode))));
+        E_FC = E_rev_FC - E_act_total - E_ohm_total - E_conc_total;
+    end
+
+    branches
+        i : p.i -> n.i;
+    end
+
+    equations
+        if E_FC > 0
+            v == N_cells*E_FC;
+        else
+            v == 0;
+        end
+        v == p.v - n.v;
+    end
+end
+
+% function approx = log(x)
+%     definitions
+%         approx = log(x + sqrt(x^2 + 1))
+%     end
+% end

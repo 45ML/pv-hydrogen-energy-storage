@@ -1,0 +1,34 @@
+Group 25 report evidence export
+MATLAB: 25.2.0.3360999 (R2025b) Update 7
+Output folder: C:\Users\DEVANG\Desktop\ed project\Simulation_Run\Group25_Simulation_Kit\report_outputs_20261024_052034_911
+  1×9 <a href="matlab:helpPopup('struct')" style="font-weight:bold">struct</a> array with fields:
+
+    Name
+    Version
+    Release
+    Date
+
+PV instrumentation failed; restoring original PV subsystem.
+Error using run_report_simulations>addPVMeasurements (line 196)
+Invalid line specifier
+
+Error in run_report_simulations (line 65)
+        addPVMeasurements(pv);
+        ^^^^^^^^^^^^^^^^^^^^^^
+
+[1/5] Running EL_100A for 600 simulated seconds...
+Final H2: 706.236619 g; fitted slope: 0.01044660 g/s
+
+[2/5] Running FC_200A for 600 simulated seconds...
+Final H2: 687.505869 g; fitted slope: -0.02089320 g/s
+
+[3/5] Running OFF for 600 simulated seconds...
+Final H2: 700.000000 g; fitted slope: -0.00000000 g/s
+
+[4/5] Running PV_1000 for 600 simulated seconds...
+Final H2: 700.000000 g; fitted slope: -0.00000000 g/s
+
+[5/5] Running PV_500 for 600 simulated seconds...
+Final H2: 700.000000 g; fitted slope: -0.00000000 g/s
+
+Finished: 5/5 cases have complete simulation data.
